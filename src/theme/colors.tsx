@@ -19,4 +19,11 @@ export const colors = {
   grey: '#6B7580',
   backgroundLightGreen: '#EAFFEA',
   darkGreen: '#076F19',
+  greyLine: '#A1AEBE',
+  black_light: '#242E39',
+  neutral_dark_1: '#1F2933',
+  inputBorder: '#D9E2EB',
+  grey6: '#6B7580',
+  buttonPrimaryColor: '#7C6BE1',
+  purpleGradientText: '#5642CC',
 };

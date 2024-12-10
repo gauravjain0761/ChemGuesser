@@ -17,6 +17,8 @@ const Header = (props: Props) => {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        paddingHorizontal: 10,
+        paddingVertical: 20,
       }}>
       <TouchableOpacity>
         <Image source={icons.hamburger} />

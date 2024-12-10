@@ -1,9 +1,12 @@
 import {
+  FlatList,
   Image,
   ImageBackground,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -13,25 +16,96 @@ import {commonFontStyle, fontFamily, SCREEN_WIDTH} from '../theme/fonts';
 import {colors} from '../theme/colors';
 import * as Progress from 'react-native-progress';
 import Header from '../compoment/Header';
+import IconButton from '../compoment/LogoButton';
+import PrimaryButton from '../compoment/CustomButton';
 
 type Props = {};
 
 const HomeScreen = (props: Props) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [selectedId, setSelected] = useState('01');
+  const [answer, setAnswer] = useState('');
   const hearts = [
     {id: 1, icon: icons.heart},
     {id: 2, icon: icons.heart},
     {id: 3, icon: icons.heart},
   ];
+
+  const questions = [
+    {
+      id: '01',
+      question: 'You probably drink coffee to get a kick from this drug',
+      img: IMAGES.questionImg,
+    },
+    {
+      id: '02',
+      question: 'You probably drink coffee to get a kick from this drug',
+      img: IMAGES.questionImg,
+    },
+    {
+      id: '03',
+      question: 'You probably drink coffee to get a kick from this drug',
+      img: IMAGES.questionImg,
+    },
+    {
+      id: '04',
+      question: 'You probably drink coffee to get a kick from this drug',
+      img: IMAGES.questionImg,
+    },
+    {
+      id: '05',
+      question: 'You probably drink coffee to get a kick from this drug',
+      img: IMAGES.questionImg,
+    },
+  ];
+  const renderItem = ({item}) => (
+    <View style={{flexDirection: 'row', gap: 10}}>
+      <View
+        style={{
+          height: 24,
+          width: 24,
+          borderRadius: 40,
+          borderColor: colors.greyLine,
+          borderWidth: 2,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Text
+          style={{
+            ...commonFontStyle(
+              fontFamily.poppinsMedium,
+              10,
+              colors.black_light,
+            ),
+          }}>
+          {item.id}
+        </Text>
+      </View>
+      {item?.id !== '01' && (
+        <View
+          style={{
+            borderColor: colors.greyLine,
+            borderTopWidth: 2,
+            transform: [{rotate: '180deg'}],
+            width: 23,
+            // marginHorizontal: 10,
+            top: '-17%',
+          }}></View>
+      )}
+    </View>
+  );
+
   return (
-    <ImageBackground source={IMAGES.OnboardingBg} style={styles.background}>
+    <ImageBackground source={IMAGES.OnboardingBg} style={{marginBottom: 100}}>
       <Header title="ChemGuess" onPressModal={() => setIsVisible(true)} />
-      <View>
+      <ScrollView
+        style={{flexGrow: 1}}
+        contentContainerStyle={styles.background}>
         <Text style={styles.greetingText}>Hi Gaurav👋</Text>
         <View style={styles.progressContainer}>
           <Progress.Bar
             progress={60 / 100}
-            width={SCREEN_WIDTH * 0.75}
+            width={SCREEN_WIDTH * 0.8}
             color={colors.progressGreen}
             unfilledColor={colors.progressWhite}
             borderColor="transparent"
@@ -43,13 +117,17 @@ const HomeScreen = (props: Props) => {
             <Text style={styles.percentageText}>60</Text>
           </View>
         </View>
-        <Image source={IMAGES.streak} style={{alignSelf: 'center'}} />
+        <Image
+          source={IMAGES.streak}
+          style={{alignSelf: 'center', marginBottom: -30}}
+        />
         <View
           style={{
             backgroundColor: colors.white,
             padding: 20,
             borderRadius: 24,
-            gap: 5,
+            gap: 10,
+            width: '100%',
           }}>
           <Text
             style={{
@@ -86,8 +164,73 @@ const HomeScreen = (props: Props) => {
               })}
             </View>
           </View>
+          <FlatList
+            data={questions}
+            renderItem={renderItem}
+            horizontal
+            contentContainerStyle={{
+              flexDirection: 'row-reverse',
+              width: '100%',
+              justifyContent: 'space-between',
+            }}
+          />
+          <Text
+            style={{
+              ...commonFontStyle(
+                fontFamily.poppinsMedium,
+                14,
+                colors.neutral_dark_1,
+              ),
+              lineHeight: 21,
+            }}>
+            {questions.find(question => question?.id === selectedId)?.question}
+          </Text>
+          <Image
+            style={{borderRadius: 20}}
+            source={
+              questions.find(question => question?.id === selectedId)?.img
+            }
+          />
+          <TextInput
+            style={{
+              borderWidth: 1,
+              borderColor: colors.inputBorder,
+              borderRadius: 20,
+              padding: 16,
+              height: 50,
+              ...commonFontStyle(fontFamily.poppinsRegular, 14, colors.black),
+            }}
+            placeholder="Answer e.g. hydrogen, H or 1"
+            placeholderTextColor={colors.grey6}
+            value={answer}
+            onChangeText={setAnswer}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+            }}>
+            <IconButton icon={icons.leftarrow} onPress={() => null} />
+            <TouchableOpacity>
+              <Image source={icons.submit} />
+            </TouchableOpacity>
+            <IconButton icon={icons.rightarrow} onPress={() => null} />
+          </View>
+          <Text
+            style={{
+              ...commonFontStyle(
+                fontFamily.poppinsBold,
+                15,
+                colors.purpleGradientText,
+              ),
+              textDecorationLine: 'underline',
+              marginTop: -45,
+              textAlign: 'center',
+            }}>
+            Reveal Answer
+          </Text>
         </View>
-      </View>
+      </ScrollView>
       <Modal transparent visible={isVisible}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -111,10 +254,10 @@ const HomeScreen = (props: Props) => {
 
 const styles = StyleSheet.create({
   background: {
-    flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 16,
     gap: 16,
+    marginBottom: 30,
   },
   greetingText: {
     ...commonFontStyle(fontFamily.poppinsSemiBold, 18, colors.white),
