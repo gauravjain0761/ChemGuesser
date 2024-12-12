@@ -5,6 +5,10 @@ export const fontFamily = {
   poppinsSemiBold: 'Poppins-SemiBold',
   poppinsBold: 'Poppins-Bold',
   poppinsRegular: 'Poppins-Regular',
+  poppinsLight: 'Poppins-Light',
+  PJSRegular: 'PlusJakartaSans-Regular',
+  PJSSB: 'PlusJakartaSans-SemiBold',
+  PJSB: 'PlusJakartaSans-Bold',
 };
 
 export const fontSizeValue = (val: number) => RFValue(val, 812);

@@ -1,74 +1,55 @@
-//import liraries
 import React from 'react';
 import {
-  ActivityIndicator,
-  Image,
-  StyleSheet,
   Text,
-  TextStyle,
   TouchableOpacity,
-  View,
+  StyleSheet,
+  GestureResponderEvent,
   ViewStyle,
 } from 'react-native';
-
-import {commonFontStyle, fontFamily, hp, wp} from '../theme/fonts';
+import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../theme/colors';
+import {fontFamily} from '../theme/fonts';
 
-type IconButtonProps = {
-  label?: string;
-  onPress?: () => any;
-  containerStyle?: ViewStyle;
-  containerLabelStyle?: TextStyle;
-  disabled?: any;
-  isLoader?: boolean;
-};
+interface FixedGradientButtonProps {
+  title: string; // Button text
+  onPress: (event: GestureResponderEvent) => void; // Button click handler
+  style?: ViewStyle; // Custom styles for width and height
+}
 
-const PrimaryButton = ({
-  label,
+const FixedGradientButton: React.FC<FixedGradientButtonProps> = ({
+  title,
   onPress,
-  containerStyle,
-  containerLabelStyle,
-  disabled,
-  isLoader,
-}: IconButtonProps) => {
+  style,
+}) => {
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={disabled}
-      style={[styles.container, containerStyle]}>
-      {isLoader ? (
-        <ActivityIndicator color={colors.white} size={25} />
-      ) : (
-        <Text style={[styles.labelTextStyle, containerLabelStyle]}>
-          {label}
-        </Text>
-      )}
+    <TouchableOpacity onPress={onPress} style={[styles.buttonContainer, style]}>
+      <LinearGradient
+        colors={['#5642CC', '#7C6BE1']}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 0}}
+        style={styles.gradient}>
+        <Text style={styles.text}>{title}</Text>
+      </LinearGradient>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    height: 48,
-    width: 143,
-    borderRadius: 27,
-    alignItems: 'center',
-    flexDirection: 'row',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.buttonPrimaryColor,
-    elevation: 3,
-    shadowColor: colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 1,
-    // shadowRadius: 5,
+  buttonContainer: {
+    borderRadius: 25, // Rounded corners
+    overflow: 'hidden',
   },
-  labelTextStyle: {
-    ...commonFontStyle(fontFamily.poppinsRegular, 18, colors.white),
+  gradient: {
+    paddingVertical: 12, // Fixed padding for height consistency
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 25,
+  },
+  text: {
+    fontSize: 16,
+    color: colors.white, // White text color
+    fontWeight: fontFamily.poppinsSemiBold,
   },
 });
 
-export default PrimaryButton;
+export default FixedGradientButton;

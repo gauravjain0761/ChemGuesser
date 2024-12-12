@@ -1,5 +1,7 @@
 export const SCREENS = {
-
-    HomeScreen: 'HomeScreen',
-
-}
+  HomeScreen: 'HomeScreen',
+  BottomTab: 'BottomTabBar',
+  Statistics: 'Statistics',
+  QuestionBank: 'QuestionBank',
+  ChemGuessPro: 'ChemGuessPro',
+};

@@ -26,4 +26,10 @@ export const colors = {
   grey6: '#6B7580',
   buttonPrimaryColor: '#7C6BE1',
   purpleGradientText: '#5642CC',
+  black2d: '#2D2D2D',
+  black0E: '#0E0D25',
+  gold: '#E28401',
+  black28: '#282A37',
+  black42: '#424862',
+  black51: '#515978',
 };

@@ -5,6 +5,10 @@ import {colors} from '../theme/colors';
 import {Text} from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import {SCREENS} from './screenNames';
+import DrawerNavigator from './DrawerNavigation';
+import Statistics from '../screens/Statistics';
+import QuestionBank from '../screens/QuestionBank';
+import ChemGuessPro from '../screens/ChemGuessPro';
 export type RootStackParamList = {
   HomeScreen: undefined;
 };
@@ -91,7 +95,22 @@ const StackNavigator: FC = () => {
       <Stack.Screen
         options={({navigation}) => ({headerShown: false})}
         name={SCREENS.HomeScreen}
-        component={HomeScreen}
+        component={DrawerNavigator}
+      />
+      <Stack.Screen
+        options={({navigation}) => ({headerShown: false})}
+        name={SCREENS.Statistics}
+        component={Statistics}
+      />
+      <Stack.Screen
+        options={({navigation}) => ({headerShown: false})}
+        name={SCREENS.QuestionBank}
+        component={QuestionBank}
+      />
+      <Stack.Screen
+        options={({navigation}) => ({headerShown: false})}
+        name={SCREENS.ChemGuessPro}
+        component={ChemGuessPro}
       />
     </Stack.Navigator>
   );
