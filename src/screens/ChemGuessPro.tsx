@@ -3,6 +3,7 @@ import {
   Image,
   ImageBackground,
   Modal,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -32,6 +33,7 @@ const ChemGuessPro = ({navigation}) => {
     <ImageBackground
       source={IMAGES.OnboardingBg}
       style={styles.imageBackground}>
+      <SafeAreaView />
       <Header
         isBack={true}
         onPressBack={() => navigation.pop(2)}

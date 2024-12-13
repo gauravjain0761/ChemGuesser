@@ -5,6 +5,7 @@ export const IMAGES = {
   questionImg: require('../assets/images/QuestionImage.png'),
   RAText: require('../assets/images/RAText.png'),
   streakBg: require('../assets/images/streakBg.png'),
+  splash: require('../assets/images/splash.png'),
 };
 
 export const icons = {

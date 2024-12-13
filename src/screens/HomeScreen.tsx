@@ -3,6 +3,7 @@ import {
   FlatList,
   Image,
   ImageBackground,
+  SafeAreaView,
   ScrollView,
   Share,
   StyleSheet,
@@ -30,11 +31,13 @@ import HeartSvg from '../assets/svg/HeartSvg.svg';
 import GradientTick from '../assets/svg/GradientTick.svg';
 import FixedGradientButton from '../compoment/CustomButton';
 import ReactNativeModal from 'react-native-modal';
+import LottieModal from '../compoment/LottieModal';
 type Props = {};
 
 const HomeScreen = (props: Props) => {
   const {params}: any = useRoute();
   const [isVisible, setIsVisible] = useState(false);
+  const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [selectedId, setSelected] = useState(1);
   const [answer, setAnswer] = useState('');
   const [tooltipVisible, setTooltipVisible] = useState(false);
@@ -43,7 +46,9 @@ const HomeScreen = (props: Props) => {
   console.log(params);
 
   useEffect(() => {
-    setTooltipVisible(true);
+    if (params?.tooltipVisible) {
+      setTooltipVisible(true);
+    }
   }, [params?.tooltipVisible]);
 
   const hearts = [
@@ -151,6 +156,7 @@ const HomeScreen = (props: Props) => {
         }
       } else if (result.action === Share.dismissedAction) {
         // Share was dismissed
+        setIsVisible(false);
         console.log('Share dismissed');
       }
     } catch (error: any) {
@@ -162,6 +168,7 @@ const HomeScreen = (props: Props) => {
     <ImageBackground
       source={IMAGES.OnboardingBg}
       style={styles.imageBackground}>
+      <SafeAreaView />
       <Header
         isHome
         title="ChemGuess"
@@ -293,7 +300,7 @@ const HomeScreen = (props: Props) => {
             />
             <FixedGradientButton
               title="Submit"
-              onPress={() => null}
+              onPress={() => setIsVisibleModal(true)}
               style={{height: 48, width: '55%', borderRadius: 20}}
             />
 
@@ -310,6 +317,7 @@ const HomeScreen = (props: Props) => {
         }}
         backdropColor="rgba(0, 0, 0, 0.5)"
         onBackdropPress={() => setIsVisible(false)}
+        onBackButtonPress={() => setIsVisible(false)}
         isVisible={isVisible}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -326,6 +334,14 @@ const HomeScreen = (props: Props) => {
           </View>
         </View>
       </ReactNativeModal>
+      {isVisibleModal && (
+        <LottieModal
+          isVisible={isVisibleModal}
+          onCloseModal={() => {
+            setIsVisibleModal(false);
+          }}
+        />
+      )}
     </ImageBackground>
   );
 };

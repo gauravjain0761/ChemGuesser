@@ -1,4 +1,4 @@
-import {ImageBackground, StyleSheet, View} from 'react-native';
+import {ImageBackground, SafeAreaView, StyleSheet, View} from 'react-native';
 import React, {useState} from 'react';
 
 import Header from '../compoment/Header';
@@ -18,6 +18,7 @@ const Settings = ({navigation}) => {
     <ImageBackground
       source={IMAGES.OnboardingBg}
       style={styles.imageBackground}>
+      <SafeAreaView />
       <Header
         isBack={true}
         onPressBack={() => navigation.pop(2)}
