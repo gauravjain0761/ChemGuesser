@@ -578,13 +578,13 @@ const styles = StyleSheet.create({
   },
   tooltipStyle: {
     backgroundColor: colors.white,
-    width: '100%',
+
     height: 130,
     marginTop: 50,
-    maxWidth: SCREEN_WIDTH * 0.8,
+    minWidth: SCREEN_WIDTH * 0.8,
     alignSelf: 'center',
     left: '-3.5%',
-    opacity: 0.8,
+    opacity: 1,
     borderRadius: 10,
   },
 });
