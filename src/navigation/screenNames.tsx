@@ -4,4 +4,5 @@ export const SCREENS = {
   Statistics: 'Statistics',
   QuestionBank: 'QuestionBank',
   ChemGuessPro: 'ChemGuessPro',
+  Settings: 'Settings',
 };

@@ -16,6 +16,7 @@ import {commonFontStyle, fontFamily, SCREEN_WIDTH} from '../theme/fonts';
 import {colors} from '../theme/colors';
 import Header from '../compoment/Header';
 import {useNavigation} from '@react-navigation/native';
+import StreakSvg from '../assets/svg/StreakSvg.svg';
 import {
   BarChart,
   LineChart,
@@ -50,7 +51,9 @@ const Statistics = ({navigation}) => {
             <Text style={styles.streakLabel}>Streak</Text>
             <View style={styles.streakValueContainer}>
               <Text style={styles.streakValue}>5</Text>
-              <Image source={icons.streak} />
+              <View style={styles.streakImage}>
+                <StreakSvg />
+              </View>
             </View>
           </View>
         </View>
@@ -159,6 +162,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 20,
+  },
+  streakImage: {
+    top: -2.5,
   },
 });
 

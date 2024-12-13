@@ -25,14 +25,14 @@ const CustomDrawer = ({navigation}) => {
   // const navigation = useNavigation();
 
   const items = [
-    {id: 1, name: 'Help', icon: HelpSvg},
+    {id: 1, name: 'Help', icon: HelpSvg, navigateTo: 'HomeScreen'},
     {
       id: 2,
       name: 'Statistics',
       icon: StatisticsSvg,
       navigateTo: 'Statistics',
     },
-    {id: 3, name: 'Previous Guesses', icon: GuessSvg},
+    {id: 3, name: 'Previous Guesses', icon: GuessSvg, navigateTo: ''},
     {
       id: 4,
       name: 'Question Bank',
@@ -40,7 +40,7 @@ const CustomDrawer = ({navigation}) => {
       navigateTo: 'QuestionBank',
     },
     {id: 5, name: 'ChemGuess Pro', icon: ProSvg, navigateTo: 'ChemGuessPro'},
-    {id: 6, name: 'Settings', icon: SettingsSvg},
+    {id: 6, name: 'Settings', icon: SettingsSvg, navigateTo: 'Settings'},
   ];
 
   return (
@@ -57,7 +57,15 @@ const CustomDrawer = ({navigation}) => {
           {items.map(item => {
             return (
               <TouchableOpacity
-                onPress={() => navigation.navigate(item.navigateTo)}
+                onPress={() =>
+                  item.navigateTo == ''
+                    ? null
+                    : item.navigateTo == 'HomeScreen'
+                    ? navigation.navigate(item.navigateTo, {
+                        tooltipVisible: Math.random() * 100,
+                      })
+                    : navigation.navigate(item.navigateTo)
+                }
                 style={{flexDirection: 'row', alignItems: 'center', gap: 18}}>
                 <item.icon />
                 <Text

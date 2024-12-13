@@ -1,25 +1,27 @@
 import {
+  Alert,
   FlatList,
   Image,
   ImageBackground,
-  Modal,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TextInput,
+  TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {icons, IMAGES} from '../assets/Images';
 import {commonFontStyle, fontFamily, SCREEN_WIDTH} from '../theme/fonts';
 import {colors} from '../theme/colors';
 import * as Progress from 'react-native-progress';
 import Header from '../compoment/Header';
 import IconButton from '../compoment/LogoButton';
-
+import Tooltip from 'react-native-walkthrough-tooltip';
 import {navigationRef} from '../navigation/RootContainer';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import ShareSvg from '../assets/svg/ShareSvg.svg';
 import StarSvg from '../assets/svg/Star.svg';
 import LineSvg from '../assets/svg/LineSvg.svg';
@@ -27,13 +29,22 @@ import StreakSvg from '../assets/svg/StreakSvg.svg';
 import HeartSvg from '../assets/svg/HeartSvg.svg';
 import GradientTick from '../assets/svg/GradientTick.svg';
 import FixedGradientButton from '../compoment/CustomButton';
+import ReactNativeModal from 'react-native-modal';
 type Props = {};
 
 const HomeScreen = (props: Props) => {
+  const {params}: any = useRoute();
   const [isVisible, setIsVisible] = useState(false);
   const [selectedId, setSelected] = useState(1);
   const [answer, setAnswer] = useState('');
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipIndex, setTooltipIndex] = useState(0);
   const navigation = useNavigation();
+  console.log(params);
+
+  useEffect(() => {
+    setTooltipVisible(true);
+  }, [params?.tooltipVisible]);
 
   const hearts = [
     {id: 1, icon: icons.heart},
@@ -74,6 +85,29 @@ const HomeScreen = (props: Props) => {
     },
   ];
 
+  const tooltipContents = [
+    'Welcome to ChemGuesser!! The quiz game where using fewer hints gives you more points.',
+    'This is the first hint. Try to guess the answer with fewer hints for higher points.',
+    'Use the Skip button if you want to move ahead without seeing the hint.',
+  ];
+
+  // Handlers for tooltip navigation
+  const handleToolTipNext = () => {
+    if (tooltipIndex < tooltipContents.length - 1) {
+      setTooltipIndex(tooltipIndex + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (tooltipIndex > 0) {
+      setTooltipIndex(tooltipIndex - 1);
+    }
+  };
+
+  const handleSkip = () => {
+    setTooltipVisible(false); // Close the tooltip on Skip
+  };
+
   const handlePrevious = () => {
     if (selectedId > 1) {
       setSelected(selectedId - 1);
@@ -100,6 +134,30 @@ const HomeScreen = (props: Props) => {
     </View>
   );
 
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: 'Check out this awesome content! https://example.com',
+        title: 'Awesome Content',
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // Specific activity (e.g., a specific app was used)
+          console.log('Shared with activity type: ', result.activityType);
+        } else {
+          // Content was shared
+          console.log('Content shared successfully');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // Share was dismissed
+        console.log('Share dismissed');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+    }
+  };
+
   return (
     <ImageBackground
       source={IMAGES.OnboardingBg}
@@ -110,6 +168,41 @@ const HomeScreen = (props: Props) => {
         onPressModal={() => setIsVisible(true)}
         onPressBurger={() => navigation.openDrawer()}
       />
+
+      <Tooltip
+        isVisible={tooltipVisible}
+        content={
+          <View style={{}}>
+            <Text style={styles.tooltipText}>
+              {tooltipContents[tooltipIndex]}
+            </Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.button} onPress={handlePrev}>
+                <Text style={styles.buttonText}>Prev</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleToolTipNext}>
+                <Text style={styles.buttonText}>Next</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={handleSkip}>
+                <Text style={styles.buttonText}>Skip</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        }
+        placement="center"
+        contentStyle={{
+          height: 'auto',
+          width: 220,
+          borderRadius: 8,
+          // marginTop: 90,
+        }}
+        onClose={() => setTooltipVisible(false)}
+        arrowStyle={{borderColor: 'black'}}
+        displayInsets={{top: 24, bottom: 24, left: 24, right: 24}}
+      />
+
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.background}>
@@ -207,7 +300,15 @@ const HomeScreen = (props: Props) => {
           <Text style={styles.revealAnswerText}>Reveal Answer</Text>
         </View>
       </ScrollView>
-      <Modal transparent visible={isVisible}>
+      <ReactNativeModal
+        style={{
+          flex: 1,
+          width: '100%',
+          alignSelf: 'center',
+        }}
+        backdropColor="rgba(0, 0, 0, 0.5)"
+        onBackdropPress={() => setIsVisible(false)}
+        isVisible={isVisible}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalText}>
@@ -217,14 +318,14 @@ const HomeScreen = (props: Props) => {
               {'Loreum epsum sit dolor\n emit loreum'}
             </Text>
             <TouchableOpacity
-              onPress={() => setIsVisible(false)}
+              onPress={() => onShare()}
               style={styles.shareButtonContainer}>
               <ShareSvg width={120} height={120} />
               {/* <Image source={icons.shareLink} /> */}
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      </ReactNativeModal>
     </ImageBackground>
   );
 };
@@ -356,9 +457,8 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
   },
   modalContainer: {
     width: '90%',
@@ -371,7 +471,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     textAlign: 'center',
     marginBottom: 20,
-    marginTop: 100,
+    marginTop: 90,
   },
   modalImage: {
     width: 30,
@@ -434,6 +534,46 @@ const styles = StyleSheet.create({
   },
   streakCount: {
     ...commonFontStyle(fontFamily.poppinsBold, 20, colors.white),
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  tooltipText: {
+    textAlign: 'center',
+    ...commonFontStyle(fontFamily.poppinsBold, 14, colors.black),
+    padding: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginHorizontal: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  tooltipTrigger: {
+    backgroundColor: '#ff5722',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  triggerText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  gameDescription: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

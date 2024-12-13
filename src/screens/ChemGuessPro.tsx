@@ -57,7 +57,7 @@ const ChemGuessPro = ({navigation}) => {
             <Text style={styles.planTitle}>Pro Plan</Text>
             <Text style={styles.planDescription}>Access all questions...</Text>
             <View style={styles.priceContainer}>
-              <Text style={styles.price}>£3</Text>
+              <Text style={styles.price}>$5</Text>
               <Text style={styles.priceDuration}>Life time</Text>
             </View>
             <View style={styles.featuresContainer}>

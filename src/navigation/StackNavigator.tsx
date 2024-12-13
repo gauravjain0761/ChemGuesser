@@ -9,6 +9,7 @@ import DrawerNavigator from './DrawerNavigation';
 import Statistics from '../screens/Statistics';
 import QuestionBank from '../screens/QuestionBank';
 import ChemGuessPro from '../screens/ChemGuessPro';
+import Settings from '../screens/Settings';
 export type RootStackParamList = {
   HomeScreen: undefined;
 };
@@ -111,6 +112,11 @@ const StackNavigator: FC = () => {
         options={({navigation}) => ({headerShown: false})}
         name={SCREENS.ChemGuessPro}
         component={ChemGuessPro}
+      />
+      <Stack.Screen
+        options={({navigation}) => ({headerShown: false})}
+        name={SCREENS.Settings}
+        component={Settings}
       />
     </Stack.Navigator>
   );

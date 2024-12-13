@@ -36,7 +36,7 @@ const FixedGradientButton: React.FC<FixedGradientButtonProps> = ({
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    borderRadius: 25, // Rounded corners
+    borderRadius: 25,
     overflow: 'hidden',
   },
   gradient: {

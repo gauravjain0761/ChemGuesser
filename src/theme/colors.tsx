@@ -32,4 +32,7 @@ export const colors = {
   black28: '#282A37',
   black42: '#424862',
   black51: '#515978',
+  toggleGreen: '#56CD54',
+  black3d: '#3D4859',
+  greyE5: '#E5E5E5',
 };
