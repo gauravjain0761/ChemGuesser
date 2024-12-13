@@ -35,11 +35,11 @@ const ChemGuessPro = ({navigation}) => {
       <Header
         isBack={true}
         onPressBack={() => navigation.pop(2)}
-        title="ChemGuessPro"
+        title="ChemGuess Pro"
       />
       <View style={styles.container}>
         <View style={styles.subscribeContainer}>
-          <Text style={styles.subscribeText}>OUR SUBSCRIBE</Text>
+          <Text style={styles.subscribeText}>SUBSCRIBE NOW</Text>
         </View>
         <View style={styles.centerContent}>
           <Text style={styles.title}>Subscribe for solutions</Text>

@@ -54,7 +54,7 @@ const QuestionBank = ({navigation}) => {
       id: 5,
       text: 'ChemGusser 5',
       icon: CgSvg,
-      tick: GreenTickSvg,
+      opacity: true,
       today: '',
     },
   ];
@@ -66,14 +66,15 @@ const QuestionBank = ({navigation}) => {
       <Header
         isBack={true}
         onPressBack={() => navigation.pop(2)}
-        title="QuestionBank"
+        title="Question Bank"
       />
       <View style={styles.container}>
         {data.map(item => {
           return (
             <TouchableOpacity
+              onPress={() => navigation.navigate('HomeScreen')}
               key={item.id}
-              style={[styles.itemContainer, {opacity: item.lock ? 0.5 : 1}]}>
+              style={[styles.itemContainer, {opacity: item.opacity ? 0.5 : 1}]}>
               <View style={styles.itemContent}>
                 <item.icon />
                 <View style={styles.itemTextContainer}>

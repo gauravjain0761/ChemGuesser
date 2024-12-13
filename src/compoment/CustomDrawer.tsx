@@ -32,7 +32,7 @@ const CustomDrawer = ({navigation}) => {
       icon: StatisticsSvg,
       navigateTo: 'Statistics',
     },
-    {id: 3, name: 'Previous Guesses', icon: GuessSvg, navigateTo: ''},
+
     {
       id: 4,
       name: 'Question Bank',

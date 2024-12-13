@@ -87,8 +87,8 @@ const HomeScreen = (props: Props) => {
 
   const tooltipContents = [
     'Welcome to ChemGuesser!! The quiz game where using fewer hints gives you more points.',
-    'This is the first hint. Try to guess the answer with fewer hints for higher points.',
-    'Use the Skip button if you want to move ahead without seeing the hint.',
+    'Number of points left to win.\n Decreases by 1 when you asnwer\n incorrectly or view the next hint.',
+    'Check out your stats, and share\n them with your friends!',
   ];
 
   // Handlers for tooltip navigation
@@ -171,6 +171,9 @@ const HomeScreen = (props: Props) => {
 
       <Tooltip
         isVisible={tooltipVisible}
+        placement={'top'}
+        onClose={() => setTooltipVisible(false)}
+        backgroundColor="transparent"
         content={
           <View style={{}}>
             <Text style={styles.tooltipText}>
@@ -180,28 +183,27 @@ const HomeScreen = (props: Props) => {
               <TouchableOpacity style={styles.button} onPress={handlePrev}>
                 <Text style={styles.buttonText}>Prev</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={handleToolTipNext}>
-                <Text style={styles.buttonText}>Next</Text>
-              </TouchableOpacity>
+              {tooltipIndex !== tooltipContents.length - 1 && (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleToolTipNext}>
+                  <Text style={styles.buttonText}>Next</Text>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity style={styles.button} onPress={handleSkip}>
-                <Text style={styles.buttonText}>Skip</Text>
+                <Text style={styles.buttonText}>
+                  {tooltipIndex === tooltipContents.length - 1
+                    ? 'Finish'
+                    : 'Skip'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         }
-        placement="center"
-        contentStyle={{
-          height: 'auto',
-          width: 220,
-          borderRadius: 8,
-          // marginTop: 90,
-        }}
-        onClose={() => setTooltipVisible(false)}
-        arrowStyle={{borderColor: 'black'}}
-        displayInsets={{top: 24, bottom: 24, left: 24, right: 24}}
-      />
+        contentStyle={styles.tooltipStyle}
+        arrowSize={{height: 0, width: 0}}>
+        <View />
+      </Tooltip>
 
       <ScrollView
         style={styles.scrollContainer}
@@ -233,9 +235,9 @@ const HomeScreen = (props: Props) => {
               <View style={styles.resultDetailsContainer}>
                 <StarSvg />
                 <View style={styles.scoreContainer}>
-                  <Text style={styles.score}>2100</Text>
+                  <Text style={styles.score}>5</Text>
                   <Text style={styles.separator}>|</Text>
-                  <Text style={styles.level}>Platinum</Text>
+                  <Text style={styles.level}>Hydrogen</Text>
                 </View>
               </View>
             </View>
@@ -314,9 +316,7 @@ const HomeScreen = (props: Props) => {
             <Text style={styles.modalText}>
               {'Share Your Points\n with Friends!'}
             </Text>
-            <Text style={styles.modalText2}>
-              {'Loreum epsum sit dolor\n emit loreum'}
-            </Text>
+            <Text style={styles.modalText2}>{'ChemGuess 20: 0 points'}</Text>
             <TouchableOpacity
               onPress={() => onShare()}
               style={styles.shareButtonContainer}>
@@ -478,14 +478,15 @@ const styles = StyleSheet.create({
     height: 30,
   },
   modalText2: {
-    ...commonFontStyle(fontFamily.poppinsRegular, 16, colors.grayText),
+    ...commonFontStyle(fontFamily.poppinsMedium, 16, colors.grayText),
     alignSelf: 'center',
     textAlign: 'center',
     lineHeight: 24,
   },
   shareButtonContainer: {
     alignSelf: 'center',
-    top: 10,
+    top: 30,
+    position: 'relative',
   },
   imagebgBackground: {
     height: 68,
@@ -542,7 +543,7 @@ const styles = StyleSheet.create({
   },
   tooltipText: {
     textAlign: 'center',
-    ...commonFontStyle(fontFamily.poppinsBold, 14, colors.black),
+    ...commonFontStyle(fontFamily.poppinsMedium, 14, colors.black),
     padding: 10,
   },
   buttonContainer: {
@@ -550,14 +551,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   button: {
-    backgroundColor: '#007BFF',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
     marginHorizontal: 5,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.purpleGradientText,
+    fontFamily: fontFamily.poppinsMedium,
     fontSize: 14,
   },
   tooltipTrigger: {
@@ -574,6 +575,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginTop: 20,
+  },
+  tooltipStyle: {
+    backgroundColor: colors.white,
+    width: '100%',
+    height: 130,
+    marginTop: 50,
+    maxWidth: SCREEN_WIDTH * 0.8,
+    alignSelf: 'center',
+    left: '-3.5%',
+    opacity: 0.8,
+    borderRadius: 10,
   },
 });
 

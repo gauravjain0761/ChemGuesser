@@ -13,7 +13,6 @@ type Props = {};
 const Settings = ({navigation}) => {
   const [isSoundSwitch, setIsSoundSwitch] = useState(false);
   const [isDarkModeSwitch, setIsDarkModeSwitch] = useState(false);
-  const [isNotificationSwitch, setIsNotificationSwitch] = useState(false);
 
   return (
     <ImageBackground
@@ -36,12 +35,6 @@ const Settings = ({navigation}) => {
           svg={MoonSvg}
           value={isDarkModeSwitch}
           onChange={setIsDarkModeSwitch}
-        />
-        <SettingsSwitch
-          label="Push Notification"
-          svg={NotificationSvg}
-          value={isNotificationSwitch}
-          onChange={setIsNotificationSwitch}
         />
       </View>
     </ImageBackground>

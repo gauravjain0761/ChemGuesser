@@ -1,6 +1,6 @@
 import {Image, ImageBackground, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import {IMAGES} from '../../assets/Images';
+import {icons, IMAGES} from '../../assets/Images';
 import {commonFontStyle, fontFamily} from '../../theme/fonts';
 import {colors} from '../../theme/colors';
 
@@ -10,7 +10,20 @@ const SplashScreen = (props: Props) => {
   return (
     <ImageBackground source={IMAGES.OnboardingBg} style={{flex: 1}}>
       <Image source={IMAGES.Decoration} />
-      <Text style={styles.Name}>ChemGuess</Text>
+      <View style={{top: '-10%'}}>
+        <Image
+          source={icons.AppIcon}
+          style={{
+            width: 100,
+            height: 100,
+            alignSelf: 'center',
+            borderColor: colors.white,
+          }}
+          // tintColor={colors.white}
+        />
+
+        <Text style={styles.Name}>ChemGuess</Text>
+      </View>
     </ImageBackground>
   );
 };

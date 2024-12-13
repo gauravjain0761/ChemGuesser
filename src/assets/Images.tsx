@@ -31,4 +31,5 @@ export const icons = {
   greytick: require('../assets/icons/greytick.png'),
   redcross: require('../assets/icons/redcross.png'),
   lock: require('../assets/icons/lock.png'),
+  AppIcon: require('../assets/icons/AppIcon.png'),
 };
