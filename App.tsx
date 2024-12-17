@@ -42,7 +42,7 @@ const App = (props: Props) => {
   return (
     <Provider store={store}>
       <View style={{flex: 1}}>
-        {loading ? <SplashScreen /> : <RootContainer />}
+        {!loading ? <SplashScreen /> : <RootContainer />}
         <Toast config={toastConfig} position="top" topOffset={0} />
       </View>
     </Provider>

@@ -12,10 +12,10 @@ const SplashScreen = (props: Props) => {
       <Image source={IMAGES.Decoration} />
       <View style={{top: '-10%'}}>
         <Image
-          source={icons.AppIcon}
+          source={icons.SplashIcon}
           style={{
-            width: 100,
-            height: 100,
+            width: 120,
+            height: 120,
             alignSelf: 'center',
             borderColor: colors.white,
           }}
@@ -32,7 +32,7 @@ export default SplashScreen;
 
 const styles = StyleSheet.create({
   Name: {
-    ...commonFontStyle(fontFamily.poppinsSemiBold, 48, colors.white),
+    ...commonFontStyle(fontFamily.poppinsSemiBold, 46, colors.white),
     alignSelf: 'center',
   },
 });

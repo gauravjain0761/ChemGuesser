@@ -212,7 +212,7 @@ const HomeScreen = (props: Props) => {
           <Text style={styles.greetingText}>Hi Gaurav👋</Text>
           <View style={styles.progressContainer}>
             <Progress.Bar
-              progress={60 / 100}
+              progress={12 / 45}
               width={SCREEN_WIDTH * 0.8}
               color={colors.progressGreen}
               unfilledColor={colors.progressWhite}
@@ -222,7 +222,7 @@ const HomeScreen = (props: Props) => {
               height={8}
             />
             <View style={styles.percentageContainer}>
-              <Text style={styles.percentageText}>60</Text>
+              <Text style={styles.percentageText}>12/45</Text>
             </View>
           </View>
         </View>

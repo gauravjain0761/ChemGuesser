@@ -38,15 +38,9 @@ const ChemGuessPro = ({navigation}) => {
         title="ChemGuess Pro"
       />
       <View style={styles.container}>
-        <View style={styles.subscribeContainer}>
-          <Text style={styles.subscribeText}>SUBSCRIBE NOW</Text>
-        </View>
         <View style={styles.centerContent}>
-          <Text style={styles.title}>Subscribe for solutions</Text>
           <Text style={styles.description}>
-            {
-              '3 Days free trial. No credit card required,\n start for enjoy our benefits'
-            }
+            {'No credit card required,\n start for enjoy our benefits'}
           </Text>
         </View>
         <View style={styles.proPlanCard}>

@@ -32,4 +32,5 @@ export const icons = {
   redcross: require('../assets/icons/redcross.png'),
   lock: require('../assets/icons/lock.png'),
   AppIcon: require('../assets/icons/AppIcon.png'),
+  SplashIcon: require('../assets/icons/SplashIcon.png'),
 };

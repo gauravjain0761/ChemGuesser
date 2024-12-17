@@ -72,7 +72,7 @@ const Statistics = ({navigation}) => {
           showGradient
           gradientColor={'#7C6BE1'}
           frontColor={colors.purpleGradientText}
-          spacing={40}
+          spacing={37}
           maxValue={5}
           initialSpacing={0}
           endSpacing={0}
