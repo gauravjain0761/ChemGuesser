@@ -1,4 +1,5 @@
 #import "AppDelegate.h"
+#import "RNSplashScreen.h"  // Import this at the top
 
 #import <React/RCTBundleURLProvider.h>
 

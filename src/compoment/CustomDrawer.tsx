@@ -44,10 +44,10 @@ const CustomDrawer = ({navigation}) => {
   ];
 
   return (
-    <SafeAreaView edges={['top']} style={styles.container}>
-      <ImageBackground
-        source={IMAGES.OnboardingBg}
-        style={{flex: 1, paddingHorizontal: 10}}>
+    <ImageBackground
+      source={IMAGES.OnboardingBg}
+      style={{flex: 1, paddingHorizontal: 10}}>
+      <SafeAreaView edges={['top']} style={styles.container}>
         <Header
           title="ChemGuess"
           isHome={false}
@@ -82,8 +82,8 @@ const CustomDrawer = ({navigation}) => {
             );
           })}
         </View>
-      </ImageBackground>
-    </SafeAreaView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 };
 
