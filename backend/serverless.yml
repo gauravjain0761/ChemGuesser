@@ -1,0 +1,112 @@
+org: lvlandfarm
+app: gtc-backend
+# Welcome to serverless. Read the docs
+# https://serverless.com/framework/docs/
+
+# Serverless.yml is the configuration the CLI
+# uses to deploy your code to your provider of choice
+
+# The `service` block is the name of the service
+service: gtc-backend
+
+frameworkVersion: '3'
+
+# The `provider` block defines where your service will be deployed
+provider:
+  name: aws
+  runtime: nodejs14.x
+
+# The `functions` block defines what code to deploy
+functions:
+#  helloWorld:
+#    handler: handler.helloWorld
+#    # The `events` block defines how to trigger the handler.helloWorld code
+#    events:
+#      - http:
+#          path: hello-world
+#          method: get
+#          cors: true
+
+  validWords:
+    handler: handler.validWords
+    events:
+      - http:
+          path: validWords
+          method: get
+          cors: true
+
+  validateWord:
+    handler: handler.validateWord
+    events:
+      - http:
+          path: validateWord
+          method: post
+          cors: true
+
+  todaysQuestion:
+    handler: handler.todaysQuestion
+    events:
+      - http:
+          path: /question/today
+          method: get
+          cors: true
+
+  allQuestions:
+    handler: handler.allQuestions
+    events:
+      - http:
+          path: /question/all
+          method: get
+          cors: true
+
+  addQuestion:
+    handler: handler.addQuestion
+    events:
+      - http:
+          path: /question/add
+          method: post
+          cors: true
+
+  updateQuestion:
+    handler: handler.updateQuestion
+    events:
+      - http:
+          path: /question/update
+          method: post
+          cors: true
+
+  submitAnswer:
+    handler: handler.submitAnswer
+    events:
+      - http:
+          path: /question/submitAnswer
+          method: post
+          cors: true
+        
+  answerHistory:
+    handler: handler.answerHistory
+    events:
+      - http:
+          path: /user/answers
+          method: get
+          cors: true
+
+  getUserInfo:
+    handler: handler.getUserInfo
+    events:
+      - http:
+          path: /user/info/get
+          method: post
+          cors: true
+
+  setUserInfo:
+    handler: handler.setUserInfo
+    events:
+      - http:
+          path: /user/info/set
+          method: post
+          cors: true
+
+
+plugins:
+  - serverless-offline
