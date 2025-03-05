@@ -276,6 +276,7 @@ module.exports.submitAnswer = async (event, context) => {
         numberOfTries,
         timeTaken,
         answeredAt: new Date().toISOString(),
+        isCorrect: correct,
       },
     }),
   );
@@ -314,12 +315,33 @@ module.exports.answerHistory = async (event, context) => {
 module.exports.getUserInfo = async (event, context) => {
   const {deviceUuid} = JSON.parse(event.body);
   const data = await getUserInfo(deviceUuid);
-  return response(200, data);
+
+  const questions = await getAllQuestions();
+  
+  const answeredQuestions = await ddbDocClient.send(
+    new ScanCommand({
+      TableName: TABLES.ANSWER_HISTORY,
+      FilterExpression: 'deviceUuid = :val1 and isCorrect = :val2',
+      ExpressionAttributeValues: {
+        ':val1': deviceUuid, 
+        ':val2': true,
+      },
+    }),
+  );
+
+  const proportionAnswered = answeredQuestions.Items.length / questions.length;
+
+  return response(200, {
+    ...data,
+    questions,
+    answeredQuestions,
+    proportionAnswered,
+  });
 };
 
 module.exports.setUserInfo = async (event, context) => {
   const TableName = TABLES.USERS;
-  const {deviceUuid, deviceToken, userName, password, isPremium} = JSON.parse(
+  const {deviceUuid, deviceToken, userName, password, isPremium, soundEnabled, darkTheme} = JSON.parse(
     event.body,
   );
   console.log('Processing ', deviceUuid);
@@ -353,15 +375,13 @@ module.exports.setUserInfo = async (event, context) => {
     }
 
     // Update item
-    await client.send(
+    await ddbDocClient.send(
       new UpdateItemCommand({
         TableName,
         Key,
         UpdateExpression: 'set deviceToken = :val1',
         ExpressionAttributeValues: {
-          ':val1': {
-            S: deviceToken,
-          },
+          ':val1': deviceToken,
         },
       }),
     );
@@ -369,16 +389,14 @@ module.exports.setUserInfo = async (event, context) => {
     // Item doesn't already exist
 
     // Create item
-    await client.send(
+    await ddbDocClient.send(
       new PutItemCommand({
         TableName,
         Item: {
-          deviceUuid: {
-            S: deviceUuid,
-          },
-          deviceToken: {
-            S: deviceToken,
-          },
+          deviceUuid,
+          deviceToken,
+          soundEnabled,
+          darkTheme,
         },
       }),
     );
@@ -390,27 +408,20 @@ module.exports.setUserInfo = async (event, context) => {
 
   // If isPremium is present, set it
   if (isPremium) {
-    await client.send(
+    await ddbDocClient.send(
       new UpdateItemCommand({
         TableName,
         Key,
         UpdateExpression: 'set isPremium = :val1',
         ExpressionAttributeValues: {
-          ':val1': {
-            BOOL: isPremium,
-          },
+          ':val1': isPremium,
         },
       }),
     );
   }
 
-  const response = {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-    },
-  };
-  return response;
+
+  response(200, {});
 };
 
 function errorResponse(callback, message = 'An error occurred') {
