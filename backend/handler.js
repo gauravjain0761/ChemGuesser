@@ -9,6 +9,7 @@ const {
 } = require('@aws-sdk/client-dynamodb');
 const crypto = require('crypto');
 const fs = require('fs');
+const uuid = require('uuid');
 
 const TABLES = {
   SYNONYMS: 'test_gtc_validwords',
@@ -59,7 +60,7 @@ module.exports.validateWord = async (event, context) => {
 };
 
 module.exports.validWords = async (event, context) => {
-  let data = await client.send(
+  let data = await ddbDocClient.send(
     new ScanCommand({
       TableName: TABLES.SYNONYMS,
     }),
@@ -247,11 +248,11 @@ module.exports.submitAnswer = async (event, context) => {
   console.log('Processing ', deviceUuid);
 
   // Check if answer is correct
-  const data = await client.send(
+  const data = await ddbDocClient.send(
     new GetItemCommand({
       TableName: TABLES.QUESTIONS,
       Key: {
-        id: {S: questionId},
+        id: questionId,
       },
     }),
   );
@@ -260,46 +261,29 @@ module.exports.submitAnswer = async (event, context) => {
     return errorResponse('Question not found');
   }
 
-  const correctAnswer = data.Item.answer.S;
+  const correctAnswer = data.Item.answer;
   const correct = correctAnswer.toLowerCase() === answer.toLowerCase();
 
   // Add answer to history
-  await client.send(
+  await ddbDocClient.send(
     new PutItemCommand({
       TableName,
       Item: {
-        deviceUuid: {
-          S: deviceUuid,
-        },
-        questionId: {
-          S: questionId,
-        },
-        answer: {
-          S: answer,
-        },
-        numberOfTries: {
-          N: numberOfTries,
-        },
-        timeTaken: {
-          N: timeTaken,
-        },
-        answeredAt: {
-          S: new Date().toISOString(),
-        },
+        uuid: uuid.v4(),
+        deviceUuid,
+        questionId,
+        answer,
+        numberOfTries,
+        timeTaken,
+        answeredAt: new Date().toISOString(),
       },
     }),
   );
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-    },
-    body: JSON.stringify({
-      correct,
-      correctAnswer,
-    }),
-  };
+  return response(200, {
+    correct,
+    correctAnswer,
+  });
 };
 
 // Get user's answer history
@@ -308,47 +292,29 @@ module.exports.answerHistory = async (event, context) => {
   const {deviceUuid} = JSON.parse(event.body);
   console.log('Processing ', deviceUuid);
 
-  const data = await client.send(
+  const data = await ddbDocClient.send(
     new ScanCommand({
       TableName,
       FilterExpression: 'deviceUuid = :val1',
       ExpressionAttributeValues: {
-        ':val1': {
-          S: deviceUuid,
-        },
+        ':val1': deviceUuid,
       },
     }),
   );
 
-  const response = {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-    },
-    body: JSON.stringify(
-      data.Items.map(item => ({
-        questionId: item.questionId.S,
-        answer: item.answer.S,
-        numberOfTries: item.numberOfTries.N,
-        timeTaken: item.timeTaken.N,
-        answeredAt: item.answeredAt.S,
-      })),
-    ),
-  };
-  return response;
-};
+  return response(200, data.Items.map(item => ({
+    questionId: item.questionId,
+    answer: item.answer,
+    numberOfTries: item.numberOfTries,
+    timeTaken: item.timeTaken,
+    answeredAt: item.answeredAt,
+  })));
+}
 
 module.exports.getUserInfo = async (event, context) => {
   const {deviceUuid} = JSON.parse(event.body);
   const data = await getUserInfo(deviceUuid);
-  const response = {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-    },
-    body: JSON.stringify(data),
-  };
-  return response;
+  return response(200, data);
 };
 
 module.exports.setUserInfo = async (event, context) => {
