@@ -14,7 +14,7 @@ frameworkVersion: '3'
 # The `provider` block defines where your service will be deployed
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
 
 # The `functions` block defines what code to deploy
 functions:

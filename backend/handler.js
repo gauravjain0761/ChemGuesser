@@ -1,12 +1,9 @@
 'use strict';
 const {
   DynamoDBClient,
-  DynamoDBDocumentClient,
-  PutItemCommand,
-  ScanCommand,
-  GetItemCommand,
   UpdateItemCommand,
 } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocument, PutCommand, GetCommand, ScanCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 const crypto = require('crypto');
 const fs = require('fs');
 const uuid = require('uuid');
@@ -22,7 +19,7 @@ const client = new DynamoDBClient({
   region: 'us-east-1',
   credentials: JSON.parse(fs.readFileSync('./creds.json').toString()),
 });
-const ddbDocClient = DynamoDBDocumentClient.from(client); 
+const ddbDocClient = DynamoDBDocument.from(client); 
 
 function response(statusCode, body) {
   return {
@@ -41,7 +38,7 @@ module.exports.validateWord = async (event, context) => {
   let {word} = JSON.parse(event.body);
 
   const data = await ddbDocClient.send(
-    new GetItemCommand({
+    new GetCommand({
       TableName: TABLES.SYNONYMS,
       Key: {
         word,
@@ -103,11 +100,11 @@ module.exports.todaysQuestion = async (event, context) => {
     ) % allQuestions.length;
 
   // Get todays question from dyndb
-  const data = await client.send(
-    new GetItemCommand({
+  const data = await ddbDocClient.send(
+    new GetCommand({
       TableName: TABLES.QUESTIONS,
       Key: {
-        id: {S: dayId.toString()},
+        id: dayId.toString(),
       },
     }),
   );
@@ -125,43 +122,17 @@ module.exports.todaysQuestion = async (event, context) => {
     };
   }
 
-  const response = {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-    },
-    body: JSON.stringify({
-      id: data.Item.id.S,
-      answer: data.Item.answer.S,
-      hints: data.Item.hints.L.map(x => x.S),
-      synonyms: data.Item.synonyms.L.map(x => x.S),
-    }),
-  };
-  return response;
+  return response(200, data.Item);
 };
 
 module.exports.allQuestions = async (event, context) => {
-  let data = await client.send(
+  let data = await ddbDocClient.send(
     new ScanCommand({
       TableName: TABLES.QUESTIONS,
     }),
   );
-  const response = {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-    },
-    body: JSON.stringify(
-      data.Items.map(item => ({
-        id: item.id.S,
-        answer: item.answer.S,
-        hints: item.hints.L.map(x => x.S),
-        synonyms: item.synonyms.L.map(x => x.S),
-      })),
-    ),
-  };
 
-  return response;
+  return response(200, data.Items);
 };
 
 module.exports.addQuestion = async (event, context) => {
@@ -184,14 +155,14 @@ module.exports.addQuestion = async (event, context) => {
   let id = (Math.max(...questions.map(x => parseInt(x.id, 10))) + 1).toString();
   let {answer, hints, synonyms} = JSON.parse(event.body);
 
-  await client.send(
-    new PutItemCommand({
+  await ddbDocClient.send(
+    new PutCommand({
       TableName: TABLES.QUESTIONS,
       Item: {
-        id: {S: id},
-        answer: {S: answer},
-        hints: {L: hints.map(x => ({S: x}))},
-        synonyms: {L: synonyms.map(x => ({S: x}))},
+        id,
+        answer,
+        hints,
+        synonyms,
       },
     }),
   );
@@ -206,50 +177,33 @@ module.exports.addQuestion = async (event, context) => {
 
 module.exports.updateQuestion = async (event, context) => {
   if (!event.body) {
-    return {
-      statusCode: 400,
-      headers: {
-        'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-      },
-      body: JSON.stringify({
-        error:
-          'Missing body with fields: id :: string, answer :: string, hints :: string[], synonyms :: string[]',
-      }),
-    };
+    return response(400, {error: 'Missing body with fields: id :: string, answer :: string, hints :: string[], synonyms :: string[]'});
   }
 
   let {id, answer, hints, synonyms} = JSON.parse(event.body);
 
-  await client.send(
-    new PutItemCommand({
+  await ddbDocClient.send(
+    new PutCommand({
       TableName: TABLES.QUESTIONS,
       Item: {
-        id: {S: id},
-        answer: {S: answer},
-        hints: {L: hints.map(x => ({S: x}))},
-        synonyms: {L: synonyms.map(x => ({S: x}))},
+        id, answer, hints, synonyms
       },
     }),
   );
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-    },
-  };
+  return response(200, {});
 };
 
 module.exports.submitAnswer = async (event, context) => {
   const TableName = TABLES.ANSWER_HISTORY;
-  const {deviceUuid, questionId, answer, timeTaken} = JSON.parse(
+  const {deviceUuid, questionId, answer, timeTaken, numberOfTries} = JSON.parse(
     event.body,
   );
   console.log('Processing ', deviceUuid);
 
   // Check if answer is correct
   const data = await ddbDocClient.send(
-    new GetItemCommand({
+    new GetCommand({
       TableName: TABLES.QUESTIONS,
       Key: {
         id: questionId,
@@ -261,15 +215,16 @@ module.exports.submitAnswer = async (event, context) => {
     return errorResponse('Question not found');
   }
 
+  console.log('Answer:', data.Item.answer);
   const correctAnswer = data.Item.answer;
   const correct = correctAnswer.toLowerCase() === answer.toLowerCase();
 
   // Add answer to history
   await ddbDocClient.send(
-    new PutItemCommand({
+    new PutCommand({
       TableName,
       Item: {
-        uuid: uuid.v4(),
+        id: uuid.v4(),
         deviceUuid,
         questionId,
         answer,
@@ -290,7 +245,7 @@ module.exports.submitAnswer = async (event, context) => {
 // Get user's answer history
 module.exports.answerHistory = async (event, context) => {
   const TableName = TABLES.ANSWER_HISTORY;
-  const {deviceUuid} = JSON.parse(event.body);
+  const {deviceUuid} = event.queryStringParameters;
   console.log('Processing ', deviceUuid);
 
   const data = await ddbDocClient.send(
@@ -303,13 +258,7 @@ module.exports.answerHistory = async (event, context) => {
     }),
   );
 
-  return response(200, data.Items.map(item => ({
-    questionId: item.questionId,
-    answer: item.answer,
-    numberOfTries: item.numberOfTries,
-    timeTaken: item.timeTaken,
-    answeredAt: item.answeredAt,
-  })));
+  return response(200, data.Items);
 }
 
 module.exports.getUserInfo = async (event, context) => {
@@ -334,7 +283,7 @@ module.exports.getUserInfo = async (event, context) => {
   return response(200, {
     ...data,
     questions,
-    answeredQuestions,
+    answeredQuestions: answeredQuestions.Items,
     proportionAnswered,
   });
 };
@@ -347,12 +296,12 @@ module.exports.setUserInfo = async (event, context) => {
   console.log('Processing ', deviceUuid);
   // Key to use for dyndb queries
   const Key = {
-    deviceUuid: {S: deviceUuid},
+    deviceUuid,
   };
 
   // body must contain deviceUuid and deviceToken
-  const existing = await client.send(
-    new GetItemCommand({
+  const existing = await ddbDocClient.send(
+    new GetCommand({
       TableName,
       Key,
     }),
@@ -362,21 +311,21 @@ module.exports.setUserInfo = async (event, context) => {
     // Item already exists, update it
 
     // If username is not set, set it
-    if (!existing.Item.userName?.S && userName)
-      await setLoginCreds(client, TableName, Key, userName, password);
+    if (!existing.Item.userName && userName)
+      await setLoginCreds(ddbDocClient, TableName, Key, userName, password);
 
     // If username is set, verify login
     // If password doesn't match, return error
     if (
-      existing.Item.userName?.S &&
-      hashPassword(password) !== existing.Item.password.S
+      existing.Item.userName &&
+      hashPassword(password) !== existing.Item.password
     ) {
       return errorResponse('Incorrect password');
     }
 
     // Update item
     await ddbDocClient.send(
-      new UpdateItemCommand({
+      new UpdateCommand({
         TableName,
         Key,
         UpdateExpression: 'set deviceToken = :val1',
@@ -390,7 +339,7 @@ module.exports.setUserInfo = async (event, context) => {
 
     // Create item
     await ddbDocClient.send(
-      new PutItemCommand({
+      new PutCommand({
         TableName,
         Item: {
           deviceUuid,
@@ -403,13 +352,13 @@ module.exports.setUserInfo = async (event, context) => {
 
     // If username is present, set it
     if (userName)
-      await setLoginCreds(client, TableName, Key, userName, password);
+      await setLoginCreds(ddbDocClient, TableName, Key, userName, password);
   }
 
   // If isPremium is present, set it
   if (isPremium) {
     await ddbDocClient.send(
-      new UpdateItemCommand({
+      new UpdateCommand({
         TableName,
         Key,
         UpdateExpression: 'set isPremium = :val1',
@@ -442,23 +391,19 @@ function errorResponse(callback, message = 'An error occurred') {
  * Given a device and account creds, set them in the database
  * @param {DynamoDBClient} client
  * @param {string} TableName
- * @param {{deviceUuid: {S: string}}} Key
+ * @param {string} Key
  * @param {string} userName
  * @param {string} password
  */
 async function setLoginCreds(client, TableName, Key, userName, password) {
   await client.send(
-    new UpdateItemCommand({
+    new UpdateCommand({
       TableName,
       Key,
       UpdateExpression: 'set userName = :val1, password = :val2',
       ExpressionAttributeValues: {
-        ':val1': {
-          S: userName,
-        },
-        ':val2': {
-          S: hashPassword(password),
-        },
+        ':val1': userName,
+        ':val2': hashPassword(password),
       },
     }),
   );
@@ -469,36 +414,26 @@ function hashPassword(password) {
 }
 
 async function getAllQuestions() {
-  let data = await client.send(
+  let data = await ddbDocClient.send(
     new ScanCommand({
       TableName: TABLES.QUESTIONS,
     }),
   );
-  return data.Items.map(item => ({
-    id: item.id.S,
-    answer: item.answer.S,
-    hints: item.hints.L.map(x => x.S),
-    synonyms: item.synonyms.L.map(x => x.S),
-  }));
+  return data.Items;
 }
 
 async function getUserInfo(deviceUuid) {
   const TableName = TABLES.USERS;
   const Key = {
-    deviceUuid: {S: deviceUuid},
+    deviceUuid,
   };
-  const data = await client.send(
-    new GetItemCommand({
+  const data = await ddbDocClient.send(
+    new GetCommand({
       TableName,
       Key,
     }),
   );
-  return {
-    deviceUuid: data.Item.deviceUuid.S,
-    deviceToken: data.Item.deviceToken.S,
-    userName: data.Item.userName?.S,
-    isPremium: data.Item.isPremium?.BOOL,
-  };
+  return data.Item;
 }
 
 // Please generate an OpenAPI 3.0 spec for this API and assign it to a variable named `openapiSpec`
